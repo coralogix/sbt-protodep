@@ -5,11 +5,6 @@ ThisBuild / scalaVersion := "2.12.12"
 ThisBuild / licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 
 ThisBuild / dynverSonatypeSnapshots := true
-ThisBuild / version := {
-  val orig = (ThisBuild / version).value
-  if (orig.endsWith("-SNAPSHOT")) "2.2.0-SNAPSHOT"
-  else orig
-}
 
 lazy val root = (project in file("."))
   .settings(

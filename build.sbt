@@ -30,7 +30,7 @@ lazy val root = (project in file("."))
     scriptedBufferLog := false,
 
     publishMavenStyle := false,
-    bintrayOrganization := Some("coralogix"),
+    bintrayOrganization := None,
     bintrayRepository := "sbt-plugins",
     publishTo := (bintray / publishTo).value,
   )

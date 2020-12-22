@@ -6,6 +6,9 @@ ThisBuild / licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICE
 
 ThisBuild / dynverSonatypeSnapshots := true
 
+val bintrayUsername = sys.env.get("BINTRAY_USERNAME").getOrElse("")
+val bintrayPassword = sys.env.get("BINTRAY_PASSWORD").getOrElse("")
+
 lazy val root = (project in file("."))
   .settings(
     name      := "sbt-protodep",
@@ -28,5 +31,6 @@ lazy val root = (project in file("."))
     bintrayOrganization := None,
     bintrayRepository := "sbt-plugins",
     publishTo := (bintray / publishTo).value,
+    credentials += Credentials("Bintray", "dl.bintray.com", bintrayUsername, bintrayPassword)
   )
   .enablePlugins(SbtPlugin)

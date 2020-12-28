@@ -13,7 +13,7 @@ import scala.sys.process.Process
 object GrpcDependencies extends AutoPlugin {
   object autoImport {
     val protodepRoot = settingKey[File]("Directory where the protodep.toml file is")
-    val protodepUp = taskKey[Unit]("Runs 'protodep up'")
+    val protodepUp = taskKey[Unit]("Runs 'protodep up -f' but only if protodep.toml has changed")
     val forcedProtodepUp = taskKey[Unit]("Runs 'protodep up -f'")
   }
 
@@ -49,7 +49,7 @@ object GrpcDependencies extends AutoPlugin {
     val protodepBinary = Protodep.autoImport.protodepBinary.value
 
     def run(): Unit =
-      protodepBinary.up(root, forced = false)
+      protodepBinary.up(root, forced = true)
 
     val cachedProtodepUp = Tracked.inputChanged[HashModifiedFileInfo, Unit](
       s.cacheStoreFactory.make("protodep.toml")

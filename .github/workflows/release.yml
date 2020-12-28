@@ -32,4 +32,4 @@ jobs:
           CI_SONATYPE_RELEASE: version
         run: |
           .github/decodekey.sh
-          sbt -J-Xms2048M -J-Xmx2048M -J-Xss6M -J-XX:ReservedCodeCacheSize=256M -J-Dfile.encoding=UTF-8 bintrayWhoami ci-release
+          sbt -J-Xms2048M -J-Xmx2048M -J-Xss6M -J-XX:ReservedCodeCacheSize=256M -J-Dfile.encoding=UTF-8 ci-release

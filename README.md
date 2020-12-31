@@ -15,16 +15,19 @@ addSbtPlugin("com.coralogix"  % "sbt-protodep" % "0.0.5")
 In `build.sbt`:
 
 ```scala
-// Enable the sbt-protodep plugin
-enablePlugins(Protodep)
-
 // This applies scalaVersion for the dynamic grpc-deps project
 ThisBuild / scalaVersion := "2.13.3"
 
 lazy val root = (project in file("."))
   // ...
   .dependsOn(LocalProject("grpc-deps")) // Depend on the generated client code
+```
 
+If you want to specify settings for `grpc-deps` you can do it like:
+
+```scala
+lazy val grpcDeps = LocalProject("grpc-deps")
+grpcDeps / Compile / scalacOptions ~= { _.filterNot(Set("-Wunused:imports", "-Xfatal-warnings"))}
 ```
 
 In `protodep.toml`:

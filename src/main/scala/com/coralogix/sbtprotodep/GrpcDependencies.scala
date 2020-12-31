@@ -31,8 +31,8 @@ object GrpcDependencies extends AutoPlugin {
       "io.github.scalapb-json"             %% "scalapb-circe"                           % "0.7.1"
     ),
     PB.targets in Compile := Seq(
-      scalapb.gen(grpc = true)          -> (sourceManaged in Compile).value,
-      scalapb.zio_grpc.ZioCodeGenerator -> (sourceManaged in Compile).value
+      scalapb.gen(grpc = true)          -> (sourceManaged in Compile).value / "scalapb",
+      scalapb.zio_grpc.ZioCodeGenerator -> (sourceManaged in Compile).value / "scalapb"
     ),
     (compile in Compile) := ((compile in Compile) dependsOn protodepUp).value,
     protodepRoot         := (ThisBuild / baseDirectory).value,

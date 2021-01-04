@@ -34,10 +34,10 @@ object GrpcDependencies extends AutoPlugin {
       scalapb.gen(grpc = true)          -> (sourceManaged in Compile).value / "scalapb",
       scalapb.zio_grpc.ZioCodeGenerator -> (sourceManaged in Compile).value / "scalapb"
     ),
-    (compile in Compile) := ((compile in Compile) dependsOn protodepUp).value,
-    protodepRoot         := (ThisBuild / baseDirectory).value,
-    protodepUp           := protodepUpTask.value,
-    forcedProtodepUp     := forcedProtodepUpTask.value
+    (PB.generate in Compile) := ((PB.generate in Compile) dependsOn protodepUp).value,
+    protodepRoot             := (ThisBuild / baseDirectory).value,
+    protodepUp               := protodepUpTask.value,
+    forcedProtodepUp         := forcedProtodepUpTask.value
   )
 
   private lazy val protodepUpTask = Def.task {

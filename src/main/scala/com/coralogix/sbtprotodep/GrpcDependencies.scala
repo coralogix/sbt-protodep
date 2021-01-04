@@ -13,6 +13,7 @@ import scala.sys.process.Process
 object GrpcDependencies extends AutoPlugin {
   object autoImport {
     val protodepRoot = settingKey[File]("Directory where the protodep.toml file is")
+    val protodepUseHttps = settingKey[Boolean]("If true, protodep will use HTTPS instead of SSH")
     val protodepUp = taskKey[Unit]("Runs 'protodep up -f' but only if protodep.toml has changed")
     val forcedProtodepUp = taskKey[Unit]("Runs 'protodep up -f'")
   }
@@ -20,6 +21,10 @@ object GrpcDependencies extends AutoPlugin {
   import autoImport._
 
   override val requires = ProtocPlugin
+
+  override lazy val globalSettings = Seq(
+    protodepUseHttps := false
+  )
 
   override lazy val projectSettings = Seq(
     libraryDependencies ++= Seq(
@@ -47,9 +52,10 @@ object GrpcDependencies extends AutoPlugin {
     val previous = protodepUp.previous
     val root = protodepRoot.value
     val protodepBinary = Protodep.autoImport.protodepBinary.value
+    val https = protodepUseHttps.value
 
     def run(): Unit =
-      protodepBinary.up(root, forced = true)
+      protodepBinary.up(root, forced = true, cleanup = true, https)
 
     val cachedProtodepUp = Tracked.inputChanged[HashModifiedFileInfo, Unit](
       s.cacheStoreFactory.make("protodep.toml")
@@ -69,6 +75,7 @@ object GrpcDependencies extends AutoPlugin {
   private lazy val forcedProtodepUpTask = Def.task {
     val protodepBinary = Protodep.autoImport.protodepBinary.value
     val root = protodepRoot.value
-    protodepBinary.up(root, forced = true)
+    val https = protodepUseHttps.value
+    protodepBinary.up(root, forced = true, cleanup = true, https)
   }
 }

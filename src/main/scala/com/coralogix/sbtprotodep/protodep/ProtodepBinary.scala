@@ -32,11 +32,15 @@ class ProtodepBinary(log: Logger, val binary: File) {
     }
   }
 
-  def up(root: File, forced: Boolean): Unit =
-    if (forced)
-      Process(binary.toString :: "up" :: "-f" :: Nil, root) ! log
-    else
-      Process(binary.toString :: "up" :: Nil, root) ! log
+  def up(root: File, forced: Boolean, cleanup: Boolean, https: Boolean): Unit = {
+    val args =
+      List(
+        if (forced) Some("-f") else None,
+        if (cleanup) Some("-c") else None,
+        if (https) Some("-u") else None
+      ).flatten
+    Process(binary.toString :: "up" :: args, root) ! log
+  }
 }
 
 object ProtodepBinary {

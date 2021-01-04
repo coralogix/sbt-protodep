@@ -27,7 +27,7 @@ If you want to specify settings for `grpc-deps` you can do it like:
 
 ```scala
 lazy val grpcDeps = LocalProject("grpc-deps")
-grpcDeps / Compile / scalacOptions ~= { _.filterNot(Set("-Wunused:imports", "-Xfatal-warnings"))}
+grpcDeps / Compile / scalacOptions --= Seq("-Wunused:imports", "-Xfatal-warnings")
 ```
 
 In `protodep.toml`:

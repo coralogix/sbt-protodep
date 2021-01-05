@@ -17,9 +17,14 @@ object Protodep extends AutoPlugin {
       .enablePlugins(GrpcDependencies)
       .settings(
         protodepVersion := "0.1.2-1-ge811cd8",
-        protodepRepo := "vigoo",
+        protodepRepo    := "vigoo",
         protodepBinary := {
-          ProtodepBinary(streams.value.log, protodepRepo.value, protodepVersion.value, targetRoot = Some(target.value))
+          ProtodepBinary(
+            streams.value.log,
+            protodepRepo.value,
+            protodepVersion.value,
+            targetRoot = Some(target.value)
+          )
         }
       )
   )

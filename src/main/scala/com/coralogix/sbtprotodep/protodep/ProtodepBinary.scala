@@ -46,6 +46,7 @@ class ProtodepBinary(log: Logger, val binary: File) {
 object ProtodepBinary {
   def apply(
     log: Logger,
+    repo: String,
     desiredVersion: String,
     targetRoot: Option[File] = None,
     forceDownload: Boolean = false
@@ -62,7 +63,7 @@ object ProtodepBinary {
         log.info(s"Using the previously downloaded protodep binary $existingDownloaded")
         existingBinary
       } else {
-        val downloaded = download(log, target, desiredVersion)
+        val downloaded = download(log, target, repo, desiredVersion)
         val downloadedBinary = new ProtodepBinary(log, downloaded)
         assert(downloadedBinary.isVersion(desiredVersion))
 
@@ -75,9 +76,9 @@ object ProtodepBinary {
   private def downloadTarget(targetRoot: File): File =
     new File(targetRoot, "protodep")
 
-  private def download(log: Logger, targetRoot: File, version: String): File = {
+  private def download(log: Logger, targetRoot: File, repo: String, version: String): File = {
     val downloadUrl = new URL(
-      s"https://github.com/stormcat24/protodep/releases/download/$version/protodep_${platform()}_${arch()}.tar.gz"
+      s"https://github.com/$repo/protodep/releases/download/$version/protodep_${platform()}_${arch()}.tar.gz"
     )
     val targetDir = downloadTarget(targetRoot)
 

@@ -18,7 +18,8 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           protodepBinary <- ZIO.effect(
                               ProtodepBinary(
                                 _root_.sbt.util.Logger.Null,
-                                "0.1.2",
+                                "vigoo",
+                                "0.1.2-1-ge811cd8",
                                 Some(tempDir.toFile),
                                 forceDownload = true
                               )
@@ -29,7 +30,7 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           version    <- ZIO.effect(protodepBinary.version())
         } yield assert(pathExists)(isTrue) &&
           assert(path.toString)(endsWithString("/protodep")) &&
-          assert(version)(isSome(equalTo("20210105-0.1.2")))
+          assert(version)(isSome(equalTo("20210105-0.1.2-1-ge811cd8")))
       )
     )
 }

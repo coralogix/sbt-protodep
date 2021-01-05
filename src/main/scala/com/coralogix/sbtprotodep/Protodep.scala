@@ -15,7 +15,7 @@ object Protodep extends AutoPlugin {
     Project("grpc-deps", file("grpc-deps"))
       .enablePlugins(GrpcDependencies)
       .settings(
-        protodepVersion := "0.1.1",
+        protodepVersion := "0.1.2",
         protodepBinary := {
           ProtodepBinary(streams.value.log, protodepVersion.value, targetRoot = Some(target.value))
         }

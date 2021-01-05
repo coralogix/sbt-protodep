@@ -12,13 +12,13 @@ import java.nio.file.Files
 object ProtodepBinarySpec extends DefaultRunnableSpec {
   override def spec: ZSpec[TestEnvironment, Any] =
     suite("ProtodepBinary")(
-      testM("can download and unpack protodep 0.1.1")(
+      testM("can download and unpack protodep 0.1.2")(
         for {
           tempDir <- ZIO.effect(Files.createTempDirectory("sbtprotodep"))
           protodepBinary <- ZIO.effect(
                               ProtodepBinary(
                                 _root_.sbt.util.Logger.Null,
-                                "0.1.1",
+                                "0.1.2",
                                 Some(tempDir.toFile),
                                 forceDownload = true
                               )
@@ -29,7 +29,7 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           version    <- ZIO.effect(protodepBinary.version())
         } yield assert(pathExists)(isTrue) &&
           assert(path.toString)(endsWithString("/protodep")) &&
-          assert(version)(isSome(equalTo("20201120-0.1.1")))
+          assert(version)(isSome(equalTo("20210105-0.1.2")))
       )
     )
 }

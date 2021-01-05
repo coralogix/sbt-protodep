@@ -6,6 +6,7 @@ import com.coralogix.sbtprotodep.protodep.ProtodepBinary
 object Protodep extends AutoPlugin {
   object autoImport {
     val protodepVersion = taskKey[String]("Protodep version to use")
+    val protodepRepo = taskKey[String]("Protodep repository to use")
     val protodepBinary = taskKey[ProtodepBinary]("Downloads and unpacks protodep")
   }
 
@@ -15,9 +16,15 @@ object Protodep extends AutoPlugin {
     Project("grpc-deps", file("grpc-deps"))
       .enablePlugins(GrpcDependencies)
       .settings(
-        protodepVersion := "0.1.2",
+        protodepVersion := "0.1.2-1-ge811cd8",
+        protodepRepo    := "vigoo",
         protodepBinary := {
-          ProtodepBinary(streams.value.log, protodepVersion.value, targetRoot = Some(target.value))
+          ProtodepBinary(
+            streams.value.log,
+            protodepRepo.value,
+            protodepVersion.value,
+            targetRoot = Some(target.value)
+          )
         }
       )
   )

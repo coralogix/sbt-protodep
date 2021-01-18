@@ -9,7 +9,7 @@ In `plugins.sbt`:
 addSbtPlugin("com.thesamet"  % "sbt-protoc" % "1.0.0-RC4")
 libraryDependencies += "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.4.2"
 
-addSbtPlugin("com.coralogix"  % "sbt-protodep" % "0.0.5")
+addSbtPlugin("com.coralogix"  % "sbt-protodep" % "0.0.7")
 ```
 
 In `build.sbt`:
@@ -22,8 +22,11 @@ lazy val root = (project in file("."))
   // ...
   .dependsOn(LocalProject("grpc-deps")) // Depend on the generated client code
 ```
-
-If you want to specify settings for `grpc-deps` you can do it like:
+To use https instead of ssh set this in your build.sbt
+```
+Global / protodepUseHttps := true
+```
+You can specify settings for `grpc-deps` like:
 
 ```scala
 lazy val grpcDeps = LocalProject("grpc-deps")

@@ -1,4 +1,3 @@
-
 ThisBuild / organization := "com.coralogix"
 ThisBuild / scalaVersion := "2.12.12"
 
@@ -22,11 +21,6 @@ lazy val root = (project in file("."))
       scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
-    scriptedBufferLog := false,
-
-    publishMavenStyle := false,
-    bintrayOrganization := None,
-    bintrayRepository := "sbt-plugins",
-    publishTo := (bintray / publishTo).value,
+    scriptedBufferLog := false
   )
   .enablePlugins(SbtPlugin)

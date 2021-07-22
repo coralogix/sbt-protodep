@@ -1,32 +1,26 @@
 name: Release
 on:
   push:
-    tags:
-      - '*'
+    branches: ['master']
+  release:
+    types:
+      - published
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  publish:
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Setup Scala
         uses: olafurpg/setup-scala@v10
         with:
           java-version: "adopt@1.11"
-      - name: Coursier cache
-        uses: coursier/cache-action@v5
-      - name: Test
-        run: |
-          sbt -J-Xms2048M -J-Xmx2048M -J-Xss6M -J-XX:ReservedCodeCacheSize=256M -J-Dfile.encoding=UTF-8 test packagedArtifacts
-      - name: Release
+      - uses: olafurpg/setup-gpg@v3
+      - run: sbt ci-release
         env:
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_PASS: ${{ secrets.BINTRAY_PASS }}
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
-          CI_CLEAN: clean
-          CI_RELEASE: publishSigned
-          CI_SONATYPE_RELEASE: version
-        run: |
-          .github/decodekey.sh
-          sbt -J-Xms2048M -J-Xmx2048M -J-Xss6M -J-XX:ReservedCodeCacheSize=256M -J-Dfile.encoding=UTF-8 ci-release
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}

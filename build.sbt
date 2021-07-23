@@ -1,9 +1,26 @@
-ThisBuild / organization := "com.coralogix"
-ThisBuild / scalaVersion := "2.12.12"
-
-ThisBuild / licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
-
-ThisBuild / dynverSonatypeSnapshots := true
+inThisBuild(
+  List(
+    scalaVersion            := "2.12.12",
+    dynverSonatypeSnapshots := true,
+    organization            := "com.coralogix",
+    licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
+    homepage := Some(url("https://github.com/coralogix/sbt-protodep")),
+    developers := List(
+      Developer(
+        "vigoo",
+        "Daniel Vigovszky",
+        "daniel.vigovszky@gmail.com",
+        url("https://www.coralogix.com")
+      ),
+      Developer(
+        "zhrebicek",
+        "Zdenek Hrebicek",
+        "zdenek.hrebicek@gmail.com",
+        url("https://www.coralogix.com")
+      )
+    )
+  )
+)
 
 lazy val root = (project in file("."))
   .settings(

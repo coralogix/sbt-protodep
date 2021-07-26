@@ -26,12 +26,12 @@ lazy val root = (project in file("."))
   .settings(
     name      := "sbt-protodep",
     sbtPlugin := true,
-    addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.0-RC4"),
+    addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.4"),
     libraryDependencies ++= Seq(
-      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.4.2",
+      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.5.0",
       "org.apache.commons"             % "commons-compress" % "1.20",
-      "dev.zio"                       %% "zio-test"         % "1.0.3" % Test,
-      "dev.zio"                       %% "zio-test-sbt"     % "1.0.3" % Test
+      "dev.zio"                       %% "zio-test"         % "1.0.9" % Test,
+      "dev.zio"                       %% "zio-test-sbt"     % "1.0.9" % Test
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     scriptedLaunchOpts := {

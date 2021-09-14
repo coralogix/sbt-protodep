@@ -4,6 +4,7 @@ import sbtprotoc.ProtocPlugin.autoImport.PB
 import sbtprotoc.ProtocPlugin
 
 import scala.sys.process.Process
+import scalapb.GeneratorOption
 
 /** Plugin to be applied to a subproject responsible for compiling the imported protobuf definitions.
   *
@@ -16,6 +17,8 @@ object GrpcDependencies extends AutoPlugin {
     val protodepUseHttps = settingKey[Boolean]("If true, protodep will use HTTPS instead of SSH")
     val protodepUp = taskKey[Unit]("Runs 'protodep up -f' but only if protodep.toml has changed")
     val forcedProtodepUp = taskKey[Unit]("Runs 'protodep up -f'")
+    val scalapbGeneratorOptions =
+      settingKey[Seq[GeneratorOption]]("Generator options to be used with scalapb")
   }
 
   import autoImport._
@@ -35,8 +38,11 @@ object GrpcDependencies extends AutoPlugin {
       "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.10" % "1.17.0-0",
       "io.github.scalapb-json"             %% "scalapb-circe"                           % "0.7.1"
     ),
+    scalapbGeneratorOptions := Seq(GeneratorOption.Grpc),
     PB.targets in Compile := Seq(
-      scalapb.gen(grpc = true)          -> (sourceManaged in Compile).value / "scalapb",
+      scalapb.gen(
+        scalapbGeneratorOptions.value.toSet
+      )                                 -> (sourceManaged in Compile).value / "scalapb",
       scalapb.zio_grpc.ZioCodeGenerator -> (sourceManaged in Compile).value / "scalapb"
     ),
     (PB.generate in Compile) := ((PB.generate in Compile) dependsOn protodepUp).value,

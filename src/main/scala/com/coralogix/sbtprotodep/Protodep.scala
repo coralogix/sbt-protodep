@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import com.coralogix.sbtprotodep.protodep.ProtodepBinary
 
-/** Plugin to be enabled top-level that adds a dynamic grpc-deps subproject to the build */
+/** Plugin that carries setting keys for Protodep. */
 object Protodep extends AutoPlugin {
   object autoImport {
     val protodepVersion = taskKey[String]("Protodep version to use")
@@ -12,8 +12,8 @@ object Protodep extends AutoPlugin {
 
   import autoImport._
 
-  override lazy val extraProjects: Seq[Project] = Seq(
-    Project("grpc-deps", file("grpc-deps"))
+  def generateProject(name: String) =
+    Project(name, file(name))
       .enablePlugins(GrpcDependencies)
       .settings(
         protodepVersion := "0.1.2-1-ge811cd8",
@@ -27,5 +27,4 @@ object Protodep extends AutoPlugin {
           )
         }
       )
-  )
 }

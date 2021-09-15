@@ -18,19 +18,15 @@ In `build.sbt`:
 // This applies scalaVersion for the dynamic grpc-deps project
 ThisBuild / scalaVersion := "2.13.3"
 
+lazy val grpcDeps = Protodep.generateProject("grpc-deps")
+
 lazy val root = (project in file("."))
   // ...
-  .dependsOn(LocalProject("grpc-deps")) // Depend on the generated client code
+  .dependsOn(grpcDeps) // Depend on the generated client code
 ```
 To use https instead of ssh set this in your build.sbt
 ```
 Global / protodepUseHttps := true
-```
-You can specify settings for `grpc-deps` like:
-
-```scala
-lazy val grpcDeps = LocalProject("grpc-deps")
-grpcDeps / Compile / scalacOptions --= Seq("-Wunused:imports", "-Xfatal-warnings")
 ```
 
 In `protodep.toml`:

@@ -1,3 +1,5 @@
+package com.coralogix.sbtprotodep
+
 import sbt._
 import Keys._
 import sbtprotoc.ProtocPlugin.autoImport.PB
@@ -33,22 +35,22 @@ object GrpcDependencies extends AutoPlugin {
     libraryDependencies ++= Seq(
       // gRPC
       "com.thesamet.scalapb"               %% "scalapb-runtime-grpc"                    % scalapb.compiler.Version.scalapbVersion,
-      "io.grpc"                             % "grpc-netty"                              % "1.34.0",
-      "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.10" % "1.17.0-0" % "protobuf",
-      "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.10" % "1.17.0-0",
-      "io.github.scalapb-json"             %% "scalapb-circe"                           % "0.7.1"
+      "io.grpc"                             % "grpc-netty"                              % "1.40.1",
+      "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % "2.5.0-2" % "protobuf",
+      "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % "2.5.0-2",
+      "io.github.scalapb-json"             %% "scalapb-circe"                           % "0.11.1"
     ),
     scalapbGeneratorOptions := Seq(GeneratorOption.Grpc),
-    PB.targets in Compile := Seq(
+    Compile / PB.targets := Seq(
       scalapb.gen(
         scalapbGeneratorOptions.value.toSet
-      )                                 -> (sourceManaged in Compile).value / "scalapb",
-      scalapb.zio_grpc.ZioCodeGenerator -> (sourceManaged in Compile).value / "scalapb"
+      )                                 -> (Compile / sourceManaged).value / "scalapb",
+      scalapb.zio_grpc.ZioCodeGenerator -> (Compile / sourceManaged).value / "scalapb"
     ),
-    (PB.generate in Compile) := ((PB.generate in Compile) dependsOn protodepUp).value,
-    protodepRoot             := (ThisBuild / baseDirectory).value,
-    protodepUp               := protodepUpTask.value,
-    forcedProtodepUp         := forcedProtodepUpTask.value
+    (Compile / PB.generate) := ((Compile / PB.generate) dependsOn protodepUp).value,
+    protodepRoot            := (ThisBuild / baseDirectory).value,
+    protodepUp              := protodepUpTask.value,
+    forcedProtodepUp        := forcedProtodepUpTask.value
   )
 
   private lazy val protodepUpTask = Def.task {

@@ -1,3 +1,5 @@
+package com.coralogix.sbtprotodep
+
 import sbt._
 import Keys._
 import com.coralogix.sbtprotodep.protodep.ProtodepBinary

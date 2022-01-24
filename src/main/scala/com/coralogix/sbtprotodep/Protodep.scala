@@ -14,8 +14,8 @@ object Protodep extends AutoPlugin {
 
   import autoImport._
 
-  def generateProject(path: String, name: Option[String] = None) =
-    Project(name.getOrElse(path), file(path))
+  def generateProject(name: String, path: Option[String] = None) =
+    Project(name, file(path.getOrElse(name)))
       .enablePlugins(GrpcDependencies)
       .settings(
         protodepVersion := "0.1.2-1-ge811cd8",

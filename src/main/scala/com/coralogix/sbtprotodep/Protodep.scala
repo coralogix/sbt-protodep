@@ -18,7 +18,7 @@ object Protodep extends AutoPlugin {
     Project(name, file(path.getOrElse(name)))
       .enablePlugins(GrpcDependencies)
       .settings(
-        protodepVersion := "0.1.6",
+        protodepVersion := "v0.1.6",
         protodepRepo    := "stormcat24",
         protodepBinary := {
           ProtodepBinary(

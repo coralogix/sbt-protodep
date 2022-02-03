@@ -18,6 +18,7 @@ object Protodep extends AutoPlugin {
     Project(name, file(path.getOrElse(name)))
       .enablePlugins(GrpcDependencies)
       .settings(
+        // v prefix is just an inconsistency added in 0.1.6
         protodepVersion := "v0.1.6",
         protodepRepo    := "stormcat24",
         protodepBinary := {

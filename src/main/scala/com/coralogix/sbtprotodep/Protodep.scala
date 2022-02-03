@@ -18,8 +18,9 @@ object Protodep extends AutoPlugin {
     Project(name, file(path.getOrElse(name)))
       .enablePlugins(GrpcDependencies)
       .settings(
-        protodepVersion := "0.1.2-1-ge811cd8",
-        protodepRepo    := "vigoo",
+        // v prefix is just an inconsistency added in 0.1.6
+        protodepVersion := "v0.1.6",
+        protodepRepo    := "stormcat24",
         protodepBinary := {
           ProtodepBinary(
             streams.value.log,

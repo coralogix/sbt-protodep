@@ -11,4 +11,5 @@ lazy val root = (project in file("."))
   .settings(
     scalaVersion := "2.13.3",
     scalacOptions ++= Seq("-verbose")
-  ).dependsOn(protodeps)
+  )
+  .dependsOn(protodeps)

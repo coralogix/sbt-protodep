@@ -28,7 +28,7 @@ lazy val root = (project in file("."))
     sbtPlugin := true,
     addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.4"),
     libraryDependencies ++= Seq(
-      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.5.1",
+      "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.6.0-test1",
       "org.apache.commons"             % "commons-compress" % "1.21",
       "dev.zio"                       %% "zio-test"         % "1.0.11" % Test,
       "dev.zio"                       %% "zio-test-sbt"     % "1.0.11" % Test

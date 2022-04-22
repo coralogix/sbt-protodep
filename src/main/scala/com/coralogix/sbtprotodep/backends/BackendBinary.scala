@@ -11,6 +11,7 @@ import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 import java.util
 import scala.annotation.tailrec
+import scala.language.postfixOps
 
 trait BackendBinary {
   def isVersion(desiredVersion: String): Boolean
@@ -26,26 +27,32 @@ object BackendBinary {
     desiredVersion: String,
     targetRoot: Option[File] = None,
     forceDownload: Boolean = false,
-    backend: BackendType
+    backendType: BackendType
   ): BackendBinary = {
+    val makeBinary = (log: Logger, file: File) =>
+      backendType match {
+        case BackendType.Protodep   => new ProtodepBinary(log, file)
+        case BackendType.Protofetch => new ProtofetchBinary(log, file)
+      }
+    val backendName = backendType.toString.toLowerCase
     val target = targetRoot.getOrElse(Files.createTempDirectory("sbt-protodep").toFile)
-    val providedBinary = new ProtodepBinary(log, new File("protodep"))
+    val providedBinary = makeBinary(log, new File(backendName))
+
     if (!forceDownload && providedBinary.isVersion(desiredVersion)) {
-      log.info(s"Using the protodep binary provided by the system")
+      log.info(s"Using the $backendName binary provided by the system")
       providedBinary
     } else {
-      val existingDownloaded =
-        new File(downloadTarget(target, backend), backend.toString.toLowerCase)
-      val existingBinary = new ProtodepBinary(log, existingDownloaded)
+      val existingDownloaded = new File(downloadTarget(target, backendType), backendName)
+      val existingBinary = makeBinary(log, existingDownloaded)
       if (existingDownloaded.exists() && existingBinary.isVersion(desiredVersion)) {
-        log.info(s"Using the previously downloaded protodep binary $existingDownloaded")
+        log.info(s"Using the previously downloaded $backendName binary $existingDownloaded")
         existingBinary
       } else {
-        val downloaded = download(log, target, repo, desiredVersion, backend)
-        val downloadedBinary = new ProtodepBinary(log, downloaded)
+        val downloaded = download(log, target, repo, desiredVersion, backendType)
+        val downloadedBinary = makeBinary(log, downloaded)
         assert(downloadedBinary.isVersion(desiredVersion))
 
-        log.info(s"Using the downloaded protodep binary $downloaded")
+        log.info(s"Using the downloaded $backendName binary $downloaded")
         downloadedBinary
       }
     }
@@ -116,26 +123,27 @@ object BackendBinary {
   private def downloadAndUnpackIfNeeded(
     log: Logger,
     url: URL,
-    target: File,
+    targetDir: File,
     backend: BackendType
   ): Unit =
     backend match {
       case BackendType.Protodep =>
         val stream = new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
-        try unpackEntry(log, stream, target)
+        try unpackEntry(log, stream, targetDir)
         finally stream.close()
       case BackendType.Protofetch =>
-        val connection = url.openConnection().asInstanceOf[HttpURLConnection]
         try {
           import sys.process._
-          connection.setConnectTimeout(5000)
-          connection.setReadTimeout(5000)
-          connection.connect()
-          if (connection.getResponseCode >= 400)
-            println(s"Error downloading ${backend.toString.toLowerCase} from $url")
-          else
-            url #> target !!
-        } finally connection.disconnect()
+          val targetFile = new File(targetDir, backend.toString.toLowerCase)
+          url #> targetFile !!
+
+          val permissions = toPermissions(755)
+          Files.setPosixFilePermissions(targetFile.toPath, permissions)
+        } catch {
+          case e: Exception =>
+            log.error(s"Failed to download file from $url with error: $e")
+            throw e
+        }
     }
 
   private def platform_with_arch(): String =

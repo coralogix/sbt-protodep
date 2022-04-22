@@ -9,9 +9,9 @@ import scala.util.{ Success, Try }
 
 class ProtodepBinary(
   log: Logger,
-  val binary: File,
-  backend: BackendType = BackendType.Protofetch
+  val binary: File
 ) extends BackendBinary {
+  val backend: BackendType = BackendType.Protodep
 
   def isVersion(desiredVersion: String): Boolean =
     version().exists(_.endsWith("-" + desiredVersion))

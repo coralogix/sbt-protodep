@@ -13,10 +13,14 @@ import scalapb.GeneratorOption
   */
 object GrpcDependencies extends AutoPlugin {
   object autoImport {
-    val protodepRoot = settingKey[File]("Directory where the protodep.toml file is")
-    val protodepUseHttps = settingKey[Boolean]("If true, protodep will use HTTPS instead of SSH")
-    val protodepUp = taskKey[Unit]("Runs 'protodep up -f' but only if protodep.toml has changed")
-    val forcedProtodepUp = taskKey[Unit]("Runs 'protodep up -f'")
+    val protodepRoot =
+      settingKey[File]("Directory where the protodep.toml / protofetch.toml file is")
+    val protodepUseHttps = settingKey[Boolean]("If true, backend will use HTTPS instead of SSH")
+    val protodepFetchProtoFiles = taskKey[Unit](
+      "Runs 'protodep up -f' or 'protofetch fetch -f' but only if protodep.toml has changed"
+    )
+    val forcedProtodepFetchProtoFiles =
+      taskKey[Unit]("Runs 'protodep up -f' or 'protofetch fetch -f'")
     val scalapbGeneratorOptions =
       settingKey[Seq[GeneratorOption]]("Generator options to be used with scalapb")
   }
@@ -45,19 +49,19 @@ object GrpcDependencies extends AutoPlugin {
       )                                 -> (Compile / sourceManaged).value / "scalapb",
       scalapb.zio_grpc.ZioCodeGenerator -> (Compile / sourceManaged).value / "scalapb"
     ),
-    (Compile / PB.generate) := ((Compile / PB.generate) dependsOn protodepUp).value,
-    protodepRoot            := (ThisBuild / baseDirectory).value,
-    protodepUp              := protodepUpTask.value,
-    forcedProtodepUp        := forcedProtodepUpTask.value
+    (Compile / PB.generate)       := ((Compile / PB.generate) dependsOn protodepFetchProtoFiles).value,
+    protodepRoot                  := (ThisBuild / baseDirectory).value,
+    protodepFetchProtoFiles       := protodepUpTask.value,
+    forcedProtodepFetchProtoFiles := forcedProtodepUpTask.value
   )
 
   private lazy val protodepUpTask = Def.task {
     import sbt.util.CacheImplicits._
 
     val s = streams.value
-    val previous = protodepUp.previous
+    val previous = protodepFetchProtoFiles.previous
     val root = protodepRoot.value
-    val protodepBinary = Protodep.autoImport.protodepBinary.value
+    val protodepBinary = Protodep.autoImport.backendBinary.value
     val https = protodepUseHttps.value
 
     def run(): Unit =
@@ -79,7 +83,7 @@ object GrpcDependencies extends AutoPlugin {
   }
 
   private lazy val forcedProtodepUpTask = Def.task {
-    val protodepBinary = Protodep.autoImport.protodepBinary.value
+    val protodepBinary = Protodep.autoImport.backendBinary.value
     val root = protodepRoot.value
     val https = protodepUseHttps.value
     protodepBinary.fetchProtoFiles(root, forced = true, cleanup = true, https)

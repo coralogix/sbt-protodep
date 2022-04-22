@@ -1,4 +1,4 @@
-package com.coralogix.sbtprotodep.protodep
+package com.coralogix.sbtprotodep.backends
 
 import org.apache.commons.compress.archivers.tar.{ TarArchiveEntry, TarArchiveInputStream }
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
@@ -6,64 +6,42 @@ import org.apache.commons.compress.utils.IOUtils
 import sbt.util.Logger
 
 import java.io.{ BufferedOutputStream, File, FileOutputStream }
-import java.net.URL
+import java.net.{ HttpURLConnection, URL }
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermission
 import java.util
 import scala.annotation.tailrec
-import scala.sys.process.Process
-import scala.util.{ Success, Try }
 
-class ProtodepBinary(log: Logger, val binary: File) {
-
-  def isVersion(desiredVersion: String): Boolean =
-    version().exists(_.endsWith("-" + desiredVersion))
-
-  private val versionMatcher =
-    """\{"Version": "([a-zA-Z0-9\-.]+)", "GitCommit": "([a-zA-Z0-9\-.]+)", "GitCommitFull": "([a-z0-9]+)", "BuildDate": "([a-zA-Z0-9\-.]+)"}""".r
-  def version(): Option[String] = {
-    val versionLine = Try(Process(binary.toString :: "version" :: Nil).lineStream(log).last)
-    log.info(s"$binary version returned $versionLine")
-    versionLine match {
-      case Success(versionMatcher(version, gitCommit, gitTag, buildDate)) =>
-        Some(version)
-      case _ =>
-        None
-    }
-  }
-
-  def up(root: File, forced: Boolean, cleanup: Boolean, https: Boolean): Unit = {
-    val args =
-      List(
-        if (forced) Some("-f") else None,
-        if (cleanup) Some("-c") else None,
-        if (https) Some("-u") else None
-      ).flatten
-    Process(binary.toString :: "up" :: args, root) ! log
-  }
+trait BackendBinary {
+  def isVersion(desiredVersion: String): Boolean
+  def fetchProtoFiles(root: File, forced: Boolean, cleanup: Boolean, https: Boolean): Unit
+  val binary: File
+  private[backends] def version(): Option[String]
 }
 
-object ProtodepBinary {
+object BackendBinary {
   def apply(
     log: Logger,
     repo: String,
     desiredVersion: String,
     targetRoot: Option[File] = None,
-    forceDownload: Boolean = false
-  ): ProtodepBinary = {
+    forceDownload: Boolean = false,
+    backend: BackendType
+  ): BackendBinary = {
     val target = targetRoot.getOrElse(Files.createTempDirectory("sbt-protodep").toFile)
     val providedBinary = new ProtodepBinary(log, new File("protodep"))
     if (!forceDownload && providedBinary.isVersion(desiredVersion)) {
       log.info(s"Using the protodep binary provided by the system")
       providedBinary
     } else {
-      val existingDownloaded = new File(downloadTarget(target), "protodep")
+      val existingDownloaded =
+        new File(downloadTarget(target, backend), backend.toString.toLowerCase)
       val existingBinary = new ProtodepBinary(log, existingDownloaded)
       if (existingDownloaded.exists() && existingBinary.isVersion(desiredVersion)) {
         log.info(s"Using the previously downloaded protodep binary $existingDownloaded")
         existingBinary
       } else {
-        val downloaded = download(log, target, repo, desiredVersion)
+        val downloaded = download(log, target, repo, desiredVersion, backend)
         val downloadedBinary = new ProtodepBinary(log, downloaded)
         assert(downloadedBinary.isVersion(desiredVersion))
 
@@ -73,20 +51,27 @@ object ProtodepBinary {
     }
   }
 
-  private def downloadTarget(targetRoot: File): File =
-    new File(targetRoot, "protodep")
+  private def downloadTarget(targetRoot: File, backend: BackendType): File =
+    new File(targetRoot, backend.toString.toLowerCase)
 
-  private def download(log: Logger, targetRoot: File, repo: String, version: String): File = {
-    val downloadUrl = new URL(
-      s"https://github.com/$repo/protodep/releases/download/$version/protodep_${platform()}_${arch()}.tar.gz"
-    )
-    val targetDir = downloadTarget(targetRoot)
-
-    log.info(s"Downloading protodep from $downloadUrl to $targetDir")
-
+  private def download(
+    log: Logger,
+    targetRoot: File,
+    repo: String,
+    version: String,
+    backend: BackendType
+  ): File = {
+    val downloadUrl = new URL(backend match {
+      case BackendType.Protofetch =>
+        s"https://github.com/$repo/protofetch/releases/download/$version/protofetch_${platform_with_arch()}"
+      case BackendType.Protodep =>
+        s"https://github.com/$repo/protodep/releases/download/$version/protodep_${platform_with_arch()}.tar.gz"
+    })
+    val targetDir = downloadTarget(targetRoot, backend)
+    log.info(s"Downloading ${backend.toString.toLowerCase} from $downloadUrl to $targetDir")
     targetDir.mkdir()
-    downloadAndUnpack(log, downloadUrl, targetDir)
-    new File(targetDir, "protodep")
+    downloadAndUnpackIfNeeded(log, downloadUrl, targetDir, backend)
+    new File(targetDir, backend.toString.toLowerCase)
   }
 
   private val permissions = PosixFilePermission.values.reverse
@@ -128,19 +113,40 @@ object ProtodepBinary {
       case None =>
     }
 
-  private def downloadAndUnpack(log: Logger, url: URL, target: File): Unit = {
-    val stream = new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
-    try unpackEntry(log, stream, target)
-    finally stream.close()
-  }
+  private def downloadAndUnpackIfNeeded(
+    log: Logger,
+    url: URL,
+    target: File,
+    backend: BackendType
+  ): Unit =
+    backend match {
+      case BackendType.Protodep =>
+        val stream = new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
+        try unpackEntry(log, stream, target)
+        finally stream.close()
+      case BackendType.Protofetch =>
+        val connection = url.openConnection().asInstanceOf[HttpURLConnection]
+        try {
+          import sys.process._
+          connection.setConnectTimeout(5000)
+          connection.setReadTimeout(5000)
+          connection.connect()
+          if (connection.getResponseCode >= 400)
+            println(s"Error downloading ${backend.toString.toLowerCase} from $url")
+          else
+            url #> target !!
+        } finally connection.disconnect()
+    }
 
-  private def arch(): String = "amd64"
-
-  private def platform(): String =
+  private def platform_with_arch(): String =
     System.getProperty("os.name").toLowerCase match {
-      case mac if mac.contains("mac")       => "darwin"
-      case win if win.contains("win")       => "windows"
-      case linux if linux.contains("linux") => "linux"
+      case mac if mac.contains("mac") =>
+        System.getProperty("os.arch").toLowerCase match {
+          case arm if arm.contains("aarch64") => "darwin_arm64"
+          case _                              => "darwin_amd64"
+        }
+      case win if win.contains("win")       => "windows_amd64"
+      case linux if linux.contains("linux") => "linux_amd64"
       case osName                           => throw new RuntimeException(s"Unknown operating system $osName")
     }
 }

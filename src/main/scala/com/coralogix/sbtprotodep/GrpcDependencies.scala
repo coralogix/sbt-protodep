@@ -1,11 +1,9 @@
 package com.coralogix.sbtprotodep
 
+import sbt.Keys._
 import sbt._
-import Keys._
-import sbtprotoc.ProtocPlugin.autoImport.PB
 import sbtprotoc.ProtocPlugin
-
-import scala.sys.process.Process
+import sbtprotoc.ProtocPlugin.autoImport.PB
 import scalapb.GeneratorOption
 
 /** Plugin to be applied to a subproject responsible for compiling the imported protobuf definitions.
@@ -63,7 +61,7 @@ object GrpcDependencies extends AutoPlugin {
     val https = protodepUseHttps.value
 
     def run(): Unit =
-      protodepBinary.up(root, forced = true, cleanup = true, https)
+      protodepBinary.fetchProtoFiles(root, forced = true, cleanup = true, https)
 
     val cachedProtodepUp = Tracked.inputChanged[HashModifiedFileInfo, Unit](
       s.cacheStoreFactory.make("protodep.toml")
@@ -84,6 +82,6 @@ object GrpcDependencies extends AutoPlugin {
     val protodepBinary = Protodep.autoImport.protodepBinary.value
     val root = protodepRoot.value
     val https = protodepUseHttps.value
-    protodepBinary.up(root, forced = true, cleanup = true, https)
+    protodepBinary.fetchProtoFiles(root, forced = true, cleanup = true, https)
   }
 }

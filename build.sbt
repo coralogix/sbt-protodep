@@ -1,6 +1,6 @@
 inThisBuild(
   List(
-    scalaVersion            := "2.12.13",
+    scalaVersion            := "2.12.15",
     dynverSonatypeSnapshots := true,
     organization            := "com.coralogix",
     licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
@@ -30,8 +30,8 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.5.1",
       "org.apache.commons"             % "commons-compress" % "1.21",
-      "dev.zio"                       %% "zio-test"         % "1.0.11" % Test,
-      "dev.zio"                       %% "zio-test-sbt"     % "1.0.11" % Test
+      "dev.zio"                       %% "zio-test"         % "1.0.14" % Test,
+      "dev.zio"                       %% "zio-test-sbt"     % "1.0.14" % Test
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     scriptedLaunchOpts := {

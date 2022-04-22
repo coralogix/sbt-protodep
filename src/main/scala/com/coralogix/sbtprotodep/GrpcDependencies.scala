@@ -55,13 +55,13 @@ object GrpcDependencies extends AutoPlugin {
     forcedProtodepFetchProtoFiles := forcedProtodepUpTask.value
   )
 
-  private lazy val protodepUpTask = Def.task {
+  lazy val protodepUpTask = Def.task {
     import sbt.util.CacheImplicits._
 
     val s = streams.value
     val previous = protodepFetchProtoFiles.previous
     val root = protodepRoot.value
-    val protodepBinary = Protodep.autoImport.backendBinary.value
+    val protodepBinary = Protodep.autoImport.protodepBackendBinary.value
     val https = protodepUseHttps.value
 
     def run(): Unit =
@@ -82,8 +82,8 @@ object GrpcDependencies extends AutoPlugin {
     cachedProtodepUp(FileInfo.full(root / "protodep.toml"))
   }
 
-  private lazy val forcedProtodepUpTask = Def.task {
-    val protodepBinary = Protodep.autoImport.backendBinary.value
+  lazy val forcedProtodepUpTask = Def.task {
+    val protodepBinary = Protodep.autoImport.protodepBackendBinary.value
     val root = protodepRoot.value
     val https = protodepUseHttps.value
     protodepBinary.fetchProtoFiles(root, forced = true, cleanup = true, https)

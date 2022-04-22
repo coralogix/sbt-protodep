@@ -7,15 +7,45 @@ import sbt._
 /** Plugin that carries setting keys for Protodep. */
 object Protodep extends AutoPlugin {
   object autoImport {
-    val backendVersion = taskKey[String]("Protodep version to use")
-    val backendRepo = taskKey[String]("Protodep repository to use")
-    val backendBinary = taskKey[BackendBinary]("Downloads and unpacks backend")
+    val protodepBackendVersion = taskKey[String]("Protodep version to use")
+    val protodepBackendRepo = taskKey[String]("Protodep repository to use")
+    val protodepBackendBinary = taskKey[BackendBinary]("Downloads and unpacks backend")
   }
 
   import autoImport._
 
-  // TODO add support for project matrix
-  // def generateProjectMatrix(state: State): Seq[(String, String)] = {
+  // This can be usefull for projjects using `sbt-projectmatrix`
+  //   you need to do there .enablePlugins(GrpcDependencies).settings(Protodep.protodepSettings)
+  lazy val protodepSettings = Seq(
+    protodepBackendVersion := "v0.1.6",
+    protodepBackendRepo    := "stormcat24",
+    protodepBackendBinary := {
+      BackendBinary(
+        streams.value.log,
+        protodepBackendRepo.value,
+        protodepBackendVersion.value,
+        targetRoot = Some(target.value),
+        backendType = BackendType.Protodep
+      )
+    }
+  )
+
+  // This can be usefull for projjects using `sbt-projectmatrix`
+  //   you need to do there .enablePlugins(GrpcDependencies).settings(Protodep.protofetchSettings)
+  lazy val protofetchSettings = Seq(
+    protodepBackendVersion := "v0.0.3",
+    protodepBackendRepo    := "coralogix",
+    protodepBackendBinary := {
+      BackendBinary(
+        streams.value.log,
+        protodepBackendRepo.value,
+        protodepBackendVersion.value,
+        targetRoot = Some(target.value),
+        forceDownload = true,
+        backendType = BackendType.Protofetch
+      )
+    }
+  )
 
   def generateProject(
     name: String,
@@ -26,35 +56,8 @@ object Protodep extends AutoPlugin {
       .enablePlugins(GrpcDependencies)
       .settings(
         backend match {
-          case BackendType.Protodep =>
-            Seq(
-              backendVersion := "v0.1.6",
-              backendRepo    := "stormcat24",
-              backendBinary := {
-                BackendBinary(
-                  streams.value.log,
-                  backendRepo.value,
-                  backendVersion.value,
-                  targetRoot = Some(target.value),
-                  backendType = BackendType.Protodep
-                )
-              }
-            )
-          case BackendType.Protofetch =>
-            Seq(
-              backendVersion := "v0.0.3",
-              backendRepo    := "coralogix",
-              backendBinary := {
-                BackendBinary(
-                  streams.value.log,
-                  backendRepo.value,
-                  backendVersion.value,
-                  targetRoot = Some(target.value),
-                  forceDownload = true,
-                  backendType = BackendType.Protofetch
-                )
-              }
-            )
+          case BackendType.Protodep   => protodepSettings
+          case BackendType.Protofetch => protofetchSettings
         }
       )
 }

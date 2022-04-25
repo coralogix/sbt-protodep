@@ -45,7 +45,7 @@ proto_outdir = "./grpc-deps/target/protobuf_external_src"
 To update protobuf to the latest commit:
 
 ```shell
-sbt grpc-deps/forcedProtodepUp
+sbt grpc-deps/forcedProtodepFetchProtoFiles
 ```
 
 ### Trick to use it with `sbt-projectmatrix`

@@ -14,7 +14,7 @@ object Protodep extends AutoPlugin {
 
   import autoImport._
 
-  // This can be usefull for projjects using `sbt-projectmatrix`
+  // This can be useful for projects using `sbt-projectmatrix`
   //   you need to do there .enablePlugins(GrpcDependencies).settings(Protodep.protodepSettings)
   lazy val protodepSettings = Seq(
     protodepBackendVersion := "v0.1.6",
@@ -30,7 +30,7 @@ object Protodep extends AutoPlugin {
     }
   )
 
-  // This can be usefull for projjects using `sbt-projectmatrix`
+  // This can be usefully for projects using `sbt-projectmatrix`
   //   you need to do there .enablePlugins(GrpcDependencies).settings(Protodep.protofetchSettings)
   lazy val protofetchSettings = Seq(
     protodepBackendVersion := "v0.0.4",

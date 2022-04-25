@@ -16,7 +16,7 @@ class ProtofetchBinary(
     version().exists(_.endsWith(desiredVersion.stripPrefix("v")))
 
   private[backends] def version(): Option[String] = {
-    val versionLine = Try(Process(binary.toString :: "-- -v" :: Nil).lineStream(log).last)
+    val versionLine = Try(Process(binary.toString :: "-- --version" :: Nil).lineStream(log).last)
     versionLine match {
       case Success(utils.protofetchVersionMatcher(version)) => Some(version)
       case _                                                => None

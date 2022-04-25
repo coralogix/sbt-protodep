@@ -30,27 +30,29 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           assertTrue(path.toString.endsWith("/protodep")) &&
           assertTrue(version.get == "20210105-0.1.2-1-ge811cd8")
       ),
-      testM("can download protofetch 0.0.6")(
+      testM("can download protofetch")(
         for {
           tempDir <- ZIO.effect(Files.createTempDirectory("sbtprotofetch"))
-          protodepBinary <- ZIO.effect(
+          version = Protodep.protofetchVersion
+          protofetchBinary <- ZIO.effect(
                               BackendBinary(
                                 _root_.sbt.util.Logger.Null,
                                 "coralogix",
-                                "v0.0.6",
+                                version,
                                 Some(tempDir.toFile),
                                 forceDownload = true,
                                 backendType = BackendType.Protofetch
                               )
                             )
-          path = protodepBinary.binary
+          path = protofetchBinary.binary
 
           pathExists <- ZIO.effect(path.exists())
           _          <- console.putStrLn(s"Downloaded protofetch to $path")
-          version    <- ZIO.effect(protodepBinary.version())
+          version    <- ZIO.effect(protofetchBinary.version())
         } yield assertTrue(pathExists) &&
           assertTrue(path.toString.endsWith("/protofetch")) &&
-          assertTrue(version.get == "0.0.6")
+          assertTrue(version.get == version.stripPrefix("v")) &&
+          assertTrue(version.isVersion(version))
       )
     )
 }

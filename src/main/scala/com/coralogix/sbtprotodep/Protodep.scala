@@ -33,7 +33,7 @@ object Protodep extends AutoPlugin {
   // This can be usefull for projjects using `sbt-projectmatrix`
   //   you need to do there .enablePlugins(GrpcDependencies).settings(Protodep.protofetchSettings)
   lazy val protofetchSettings = Seq(
-    protodepBackendVersion := "v0.0.3",
+    protodepBackendVersion := "v0.0.4",
     protodepBackendRepo    := "coralogix",
     protodepBackendBinary := {
       BackendBinary(

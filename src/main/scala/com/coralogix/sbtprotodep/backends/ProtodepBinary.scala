@@ -20,8 +20,9 @@ class ProtodepBinary(
     val versionLine = Try(Process(binary.toString :: "version" :: Nil).lineStream(log).last)
     log.info(s"$binary version returned $versionLine")
     versionLine match {
-      case Success(utils.versionMatcher(version, gitCommit, gitTag, buildDate)) => Some(version)
-      case _                                                                    => None
+      case Success(utils.protodepVersionMatcher(version, gitCommit, gitTag, buildDate)) =>
+        Some(version)
+      case _ => None
     }
   }
 

@@ -5,6 +5,7 @@ import zio.test.environment.TestEnvironment
 import zio.{ console, ZIO }
 
 import java.nio.file.Files
+import com.coralogix.sbtprotodep._
 
 object ProtodepBinarySpec extends DefaultRunnableSpec {
   override def spec: ZSpec[TestEnvironment, Any] =
@@ -33,12 +34,11 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
       testM("can download protofetch")(
         for {
           tempDir <- ZIO.effect(Files.createTempDirectory("sbtprotofetch"))
-          version = Protodep.protofetchVersion
           protofetchBinary <- ZIO.effect(
                               BackendBinary(
                                 _root_.sbt.util.Logger.Null,
                                 "coralogix",
-                                version,
+                                protofetchVersion,
                                 Some(tempDir.toFile),
                                 forceDownload = true,
                                 backendType = BackendType.Protofetch
@@ -51,8 +51,8 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           version    <- ZIO.effect(protofetchBinary.version())
         } yield assertTrue(pathExists) &&
           assertTrue(path.toString.endsWith("/protofetch")) &&
-          assertTrue(version.get == version.stripPrefix("v")) &&
-          assertTrue(version.isVersion(version))
+          assertTrue(version.get == protofetchVersion.stripPrefix("v")) &&
+          assertTrue(protofetchBinary.isVersion(protofetchVersion))
       )
     )
 }

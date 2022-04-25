@@ -17,7 +17,7 @@ object Protodep extends AutoPlugin {
   // This can be useful for projects using `sbt-projectmatrix`
   //   you need to do there .enablePlugins(GrpcDependencies).settings(Protodep.protodepSettings)
   lazy val protodepSettings = Seq(
-    protodepBackendVersion := "v0.1.6",
+    protodepBackendVersion := protodepVersion,
     protodepBackendRepo    := "stormcat24",
     protodepBackendBinary := {
       BackendBinary(

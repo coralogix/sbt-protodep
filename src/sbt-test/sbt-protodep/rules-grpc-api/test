@@ -2,7 +2,7 @@
 $ absent grpc-deps/target/protobuf_external_src/com/coralogix/rules/v1/RuleGroupsService.proto
 $ absent grpc-deps/target/scala-2.13/src_managed/main/scalapb/com/coralogix/rules/grpc/external/v1/RuleGroupsService/ZioRulegroupsService.scala
 $ absent grpc-deps/target/scala-2.13/classes/com/coralogix/rules/grpc/external/v1/RuleGroupsService/ZioRuleGroupsService.class
-> grpc-deps/forcedProtodepUp
+> grpc-deps/forcedProtodepFetchProtoFiles
 > grpc-deps/compile
 $ exists grpc-deps/target/protobuf_external_src/com/coralogix/rules/v1/RuleGroupsService.proto
 $ exists grpc-deps/target/scala-2.13/src_managed/main/scalapb/com/coralogix/rules/grpc/external/v1/RuleGroupsService/ZioRuleGroupsService.scala

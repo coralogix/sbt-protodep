@@ -35,15 +35,15 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
         for {
           tempDir <- ZIO.effect(Files.createTempDirectory("sbtprotofetch"))
           protofetchBinary <- ZIO.effect(
-                              BackendBinary(
-                                _root_.sbt.util.Logger.Null,
-                                "coralogix",
-                                protofetchVersion,
-                                Some(tempDir.toFile),
-                                forceDownload = true,
-                                backendType = BackendType.Protofetch
+                                BackendBinary(
+                                  _root_.sbt.util.Logger.Null,
+                                  "coralogix",
+                                  protofetchVersion,
+                                  Some(tempDir.toFile),
+                                  forceDownload = true,
+                                  backendType = BackendType.Protofetch
+                                )
                               )
-                            )
           path = protofetchBinary.binary
 
           pathExists <- ZIO.effect(path.exists())

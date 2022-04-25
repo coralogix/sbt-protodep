@@ -44,6 +44,7 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
                               )
                             )
           path = protodepBinary.binary
+          
           pathExists <- ZIO.effect(path.exists())
           _          <- console.putStrLn(s"Downloaded protofetch to $path")
           version    <- ZIO.effect(protodepBinary.version())

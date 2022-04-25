@@ -49,7 +49,7 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           version    <- ZIO.effect(protodepBinary.version())
         } yield assertTrue(pathExists) &&
           assertTrue(path.toString.endsWith("/protofetch")) &&
-          assertTrue(version.get == "0.0.4") 
+          assertTrue(version.get == "0.0.4")
       )
     )
 }

@@ -28,7 +28,7 @@ class ProtofetchBinary(
     println("Ignoring any force, cleanup, https flags as protofetch does not support them")
     val args: List[String] =
       List(
-               if (forced) Some("-f") else None,
+        if (forced) Some("-f") else None,
         //        if (cleanup) Some("-c") else None,
         //        if (https) Some("-u") else None
         None

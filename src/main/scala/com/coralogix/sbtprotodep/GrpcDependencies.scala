@@ -37,10 +37,10 @@ object GrpcDependencies extends AutoPlugin {
     libraryDependencies ++= Seq(
       // gRPC
       "com.thesamet.scalapb"               %% "scalapb-runtime-grpc"                    % scalapb.compiler.Version.scalapbVersion,
-      "io.grpc"                             % "grpc-netty"                              % "1.40.1",
+      "io.grpc"                             % "grpc-netty"                              % scalapb.compiler.Version.grpcJavaVersion,
       "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % "2.5.0-2" % "protobuf",
       "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % "2.5.0-2",
-      "io.github.scalapb-json"             %% "scalapb-circe"                           % "0.11.1"
+      "io.github.scalapb-json"             %% "scalapb-circe"                           % "0.11.2"
     ),
     scalapbGeneratorOptions := Seq(GeneratorOption.Grpc),
     Compile / PB.targets := Seq(

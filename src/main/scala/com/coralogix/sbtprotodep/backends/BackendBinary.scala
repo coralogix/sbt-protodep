@@ -7,7 +7,7 @@ import sbt.util.Logger
 
 import java.io.{ BufferedOutputStream, File, FileOutputStream }
 import java.net.{ HttpURLConnection, URL }
-import java.nio.file.Files
+import java.nio.file.{ FileSystems, Files }
 import java.nio.file.attribute.PosixFilePermission
 import java.util
 import scala.annotation.tailrec
@@ -95,6 +95,8 @@ object BackendBinary {
     result
   }
 
+  lazy val isPosix = FileSystems.getDefault().supportedFileAttributeViews().contains("posix")
+
   @tailrec
   private def unpackEntry(log: Logger, stream: TarArchiveInputStream, target: File): Unit =
     Option(stream.getNextEntry) match {
@@ -111,8 +113,10 @@ object BackendBinary {
             log.info(s"Unpacked $len bytes to $file")
           } finally outputStream.close()
 
-          val permissions = toPermissions(entry.getMode)
-          Files.setPosixFilePermissions(file.toPath, permissions)
+          if (isPosix) {
+            val permissions = toPermissions(entry.getMode)
+            Files.setPosixFilePermissions(file.toPath, permissions)
+          }
         }
         unpackEntry(log, stream, target)
       case Some(_) =>
@@ -137,8 +141,10 @@ object BackendBinary {
           val targetFile = new File(targetDir, backend.toString.toLowerCase)
           url #> targetFile !!
 
-          val permissions = toPermissions(755)
-          Files.setPosixFilePermissions(targetFile.toPath, permissions)
+          if (isPosix) {
+            val permissions = toPermissions(755)
+            Files.setPosixFilePermissions(targetFile.toPath, permissions)
+          }
         } catch {
           case e: Exception =>
             log.error(s"Failed to download file from $url with error: $e")

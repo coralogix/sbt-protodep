@@ -50,6 +50,9 @@ object BackendBinary {
       } else {
         val downloaded = download(log, target, repo, desiredVersion, backendType)
         val downloadedBinary = makeBinary(log, downloaded)
+        log.info(
+          s"Expected version is: ${desiredVersion}, binary version is: ${downloadedBinary.version()}"
+        )
         assert(downloadedBinary.isVersion(desiredVersion))
 
         log.info(s"Using the downloaded $backendName binary $downloaded")

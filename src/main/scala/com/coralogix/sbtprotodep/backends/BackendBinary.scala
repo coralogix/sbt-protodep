@@ -130,7 +130,7 @@ object BackendBinary {
   private def downloadAndUnpack(
     log: Logger,
     url: URL,
-    targetDir: File,
+    targetDir: File
   ): Unit = {
     val stream = new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
     try unpackEntry(log, stream, targetDir)

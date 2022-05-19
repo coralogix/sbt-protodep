@@ -73,14 +73,14 @@ object BackendBinary {
   ): File = {
     val downloadUrl = new URL(backend match {
       case BackendType.Protofetch =>
-        s"https://github.com/$repo/protofetch/releases/download/$version/protofetch_${platform_with_arch()}"
+        s"https://github.com/$repo/protofetch/releases/download/$version/protofetch_${platform_with_arch()}.tar.gz"
       case BackendType.Protodep =>
         s"https://github.com/$repo/protodep/releases/download/$version/protodep_${platform_with_arch()}.tar.gz"
     })
     val targetDir = downloadTarget(targetRoot, backend)
     log.info(s"Downloading ${backend.toString.toLowerCase} from $downloadUrl to $targetDir")
     targetDir.mkdir()
-    downloadAndUnpackIfNeeded(log, downloadUrl, targetDir, backend)
+    downloadAndUnpack(log, downloadUrl, targetDir)
     new File(targetDir, backend.toString.toLowerCase)
   }
 
@@ -127,33 +127,15 @@ object BackendBinary {
       case None =>
     }
 
-  private def downloadAndUnpackIfNeeded(
+  private def downloadAndUnpack(
     log: Logger,
     url: URL,
     targetDir: File,
-    backend: BackendType
-  ): Unit =
-    backend match {
-      case BackendType.Protodep =>
-        val stream = new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
-        try unpackEntry(log, stream, targetDir)
-        finally stream.close()
-      case BackendType.Protofetch =>
-        try {
-          import sys.process._
-          val targetFile = new File(targetDir, backend.toString.toLowerCase)
-          url #> targetFile !!
-
-          if (isPosix) {
-            val permissions = toPermissions(755)
-            Files.setPosixFilePermissions(targetFile.toPath, permissions)
-          }
-        } catch {
-          case e: Exception =>
-            log.error(s"Failed to download file from $url with error: $e")
-            throw e
-        }
-    }
+  ): Unit = {
+    val stream = new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
+    try unpackEntry(log, stream, targetDir)
+    finally stream.close()
+  }
 
   private def platform_with_arch(): String =
     System.getProperty("os.name").toLowerCase match {

@@ -81,7 +81,12 @@ object BackendBinary {
     log.info(s"Downloading ${backend.toString.toLowerCase} from $downloadUrl to $targetDir")
     targetDir.mkdir()
     downloadAndUnpack(log, downloadUrl, targetDir)
-    new File(targetDir, backend.toString.toLowerCase)
+    backend match {
+      case BackendType.Protofetch =>
+        new File(targetDir.getName + "/bin", backend.toString.toLowerCase)
+      case BackendType.Protodep =>
+        new File(targetDir, backend.toString.toLowerCase)
+    }
   }
 
   private val permissions = PosixFilePermission.values.reverse

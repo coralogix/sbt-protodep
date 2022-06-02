@@ -6,7 +6,7 @@ import org.apache.commons.compress.utils.IOUtils
 import sbt.util.Logger
 
 import java.io.{ BufferedOutputStream, File, FileOutputStream }
-import java.net.{ HttpURLConnection, URL }
+import java.net.URL
 import java.nio.file.{ FileSystems, Files }
 import java.nio.file.attribute.PosixFilePermission
 import java.util
@@ -80,7 +80,7 @@ object BackendBinary {
     val targetDir = downloadTarget(targetRoot, backend)
     log.info(s"Downloading ${backend.toString.toLowerCase} from $downloadUrl to $targetDir")
     targetDir.mkdir()
-    downloadAndUnpack(log, downloadUrl, targetDir)
+    downloadAndUnpack(log, backend, downloadUrl, targetDir)
     new File(targetDir, backend.toString.toLowerCase)
   }
 
@@ -101,7 +101,12 @@ object BackendBinary {
   lazy val isPosix = FileSystems.getDefault().supportedFileAttributeViews().contains("posix")
 
   @tailrec
-  private def unpackEntry(log: Logger, stream: TarArchiveInputStream, target: File): Unit =
+  private def unpackEntry(
+    log: Logger,
+    backend: BackendType,
+    stream: TarArchiveInputStream,
+    target: File
+  ): Unit =
     Option(stream.getNextEntry) match {
       case Some(entry: TarArchiveEntry) =>
         if (entry.isDirectory) {
@@ -109,7 +114,13 @@ object BackendBinary {
           dir.mkdir()
           log.info(s"Created directory $dir")
         } else {
-          val file = new File(target, entry.getName)
+          val file = backend match {
+            case BackendType.Protofetch =>
+              new File(target, entry.getName.stripPrefix("bin/"))
+            case BackendType.Protodep =>
+              new File(target, entry.getName)
+          }
+
           val outputStream = new BufferedOutputStream(new FileOutputStream(file, false))
           try {
             val len = IOUtils.copy(stream, outputStream)
@@ -121,7 +132,7 @@ object BackendBinary {
             Files.setPosixFilePermissions(file.toPath, permissions)
           }
         }
-        unpackEntry(log, stream, target)
+        unpackEntry(log, backend, stream, target)
       case Some(_) =>
         throw new RuntimeException(s"Entry in tar is not a TarAcrhiveEntry")
       case None =>
@@ -129,11 +140,12 @@ object BackendBinary {
 
   private def downloadAndUnpack(
     log: Logger,
+    backend: BackendType,
     url: URL,
     targetDir: File
   ): Unit = {
     val stream = new TarArchiveInputStream(new GzipCompressorInputStream(url.openStream()))
-    try unpackEntry(log, stream, targetDir)
+    try unpackEntry(log, backend, stream, targetDir)
     finally stream.close()
   }
 

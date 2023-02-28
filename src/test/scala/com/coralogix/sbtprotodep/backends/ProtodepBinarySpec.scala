@@ -16,8 +16,8 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           protodepBinary <- ZIO.effect(
                               BackendBinary(
                                 _root_.sbt.util.Logger.Null,
-                                "vigoo",
-                                "0.1.2-1-ge811cd8",
+                                "stormcat24",
+                                "v0.1.7",
                                 Some(tempDir.toFile),
                                 forceDownload = true,
                                 backendType = BackendType.Protodep
@@ -29,7 +29,7 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           version    <- ZIO.effect(protodepBinary.version())
         } yield assertTrue(pathExists) &&
           assertTrue(path.toString.endsWith("/protodep")) &&
-          assertTrue(version.get == "20210105-0.1.2-1-ge811cd8")
+          assertTrue(version.get == "20220211-v0.1.7")
       ),
       testM("can download protofetch")(
         for {

@@ -73,9 +73,9 @@ object BackendBinary {
   ): File = {
     val downloadUrl = new URL(backend match {
       case BackendType.Protofetch =>
-        s"https://github.com/$repo/protofetch/releases/download/$version/protofetch_${platform_with_arch()}.tar.gz"
+        s"https://github.com/$repo/protofetch/releases/download/$version/protofetch_${platformProtofetch()}.tar.gz"
       case BackendType.Protodep =>
-        s"https://github.com/$repo/protodep/releases/download/$version/protodep_${platform_with_arch()}.tar.gz"
+        s"https://github.com/$repo/protodep/releases/download/$version/protodep_${platformProtodep()}.tar.gz"
     })
     val targetDir = downloadTarget(targetRoot, backend)
     log.info(s"Downloading ${backend.toString.toLowerCase} from $downloadUrl to $targetDir")
@@ -149,15 +149,35 @@ object BackendBinary {
     finally stream.close()
   }
 
-  private def platform_with_arch(): String =
+  private def platformProtodep(): String =
     System.getProperty("os.name").toLowerCase match {
       case mac if mac.contains("mac") =>
         System.getProperty("os.arch").toLowerCase match {
           case arm if arm.contains("aarch64") => "darwin_arm64"
           case _                              => "darwin_amd64"
         }
-      case win if win.contains("win")       => "windows_amd64"
-      case linux if linux.contains("linux") => "linux_amd64"
-      case osName                           => throw new RuntimeException(s"Unknown operating system $osName")
+      case win if win.contains("win") => "windows_amd64"
+      case linux if linux.contains("linux") =>
+        System.getProperty("os.arch").toLowerCase match {
+          case "aarch64"          => "linux_arm64"
+          case "x86_64" | "amd64" => "linux_amd64"
+        }
+      case osName => throw new RuntimeException(s"Unknown operating system $osName")
+    }
+
+  private def platformProtofetch(): String =
+    System.getProperty("os.name").toLowerCase match {
+      case mac if mac.contains("mac") =>
+        System.getProperty("os.arch").toLowerCase match {
+          case arm if arm.contains("aarch64") => "darwin_arm64"
+          case _                              => "darwin_amd64"
+        }
+      case win if win.contains("win") => "windows_amd64"
+      case linux if linux.contains("linux") =>
+        System.getProperty("os.arch").toLowerCase match {
+          case "aarch64"          => "aarch64-unknown-linux-musl"
+          case "x86_64" | "amd64" => "x86_64-unknown-linux-musl"
+        }
+      case osName => throw new RuntimeException(s"Unknown operating system $osName")
     }
 }

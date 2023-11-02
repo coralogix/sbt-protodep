@@ -15,12 +15,12 @@ object GrpcDependencies extends AutoPlugin {
   object autoImport {
     val protodepRoot =
       settingKey[File]("Directory where the protodep.toml / protofetch.toml file is")
-    val protodepUseHttps = settingKey[Boolean]("If true, backend will use HTTPS instead of SSH")
-    val protodepFetchProtoFiles = taskKey[Unit](
-      "Runs 'protodep up -f' or 'protofetch fetch -f' but only if protodep.toml has changed"
-    )
+    val protodepUseHttps =
+      settingKey[Boolean]("If true, backend will use HTTPS instead of SSH (ignored by protofetch)")
+    val protodepFetchProtoFiles =
+      taskKey[Unit]("Runs 'protodep up' or 'protofetch fetch' (with '--locked' if on CI)")
     val forcedProtodepFetchProtoFiles =
-      taskKey[Unit]("Runs 'protodep up -f' or 'protofetch fetch -f'")
+      taskKey[Unit]("Runs 'protodep up -f' or 'protofetch update && protofetch fetch'")
     val scalapbGeneratorOptions =
       settingKey[Seq[GeneratorOption]]("Generator options to be used with scalapb")
   }
@@ -62,10 +62,11 @@ object GrpcDependencies extends AutoPlugin {
     val previous = protodepFetchProtoFiles.previous
     val root = protodepRoot.value
     val protodepBinary = Protodep.autoImport.protodepBackendBinary.value
+    val ci = insideCI.value
     val https = protodepUseHttps.value
 
     def run(): Unit =
-      protodepBinary.fetchProtoFiles(root, forced = true, cleanup = true, https)
+      protodepBinary.fetchProtoFiles(root, locked = ci, https = https)
 
     val cachedProtodepUp = Tracked.inputChanged[HashModifiedFileInfo, Unit](
       s.cacheStoreFactory.make("protodep.toml")
@@ -86,6 +87,6 @@ object GrpcDependencies extends AutoPlugin {
     val protodepBinary = Protodep.autoImport.protodepBackendBinary.value
     val root = protodepRoot.value
     val https = protodepUseHttps.value
-    protodepBinary.fetchProtoFiles(root, forced = true, cleanup = true, https)
+    protodepBinary.updateProtoFiles(root, https = https)
   }
 }

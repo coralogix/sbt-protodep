@@ -66,7 +66,7 @@ object GrpcDependencies extends AutoPlugin {
     val https = protodepUseHttps.value
 
     def run(): Unit =
-      protodepBinary.fetchProtoFiles(root, locked = ci, https = https)
+      protodepBinary.fetchProtoFiles(root, ci = ci, https = https)
 
     val cachedProtodepUp = Tracked.inputChanged[HashModifiedFileInfo, Unit](
       s.cacheStoreFactory.make("protodep.toml")

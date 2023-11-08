@@ -23,8 +23,8 @@ class ProtofetchBinary(
     }
   }
 
-  def fetchProtoFiles(root: File, locked: Boolean, https: Boolean): Unit = {
-    val args = if (locked) List("--locked") else Nil
+  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit = {
+    val args = if (ci) List("--locked") else Nil
     log.debug(s"Using binary: ${binary.toString}")
     Process(binary.toString :: "fetch" :: args, root) ! log
   }

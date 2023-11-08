@@ -15,7 +15,7 @@ import scala.language.postfixOps
 
 trait BackendBinary {
   def isVersion(desiredVersion: String): Boolean
-  def fetchProtoFiles(root: File, locked: Boolean, https: Boolean): Unit
+  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit
   def updateProtoFiles(root: File, https: Boolean): Unit
   val binary: File
   private[backends] def version(): Option[String]

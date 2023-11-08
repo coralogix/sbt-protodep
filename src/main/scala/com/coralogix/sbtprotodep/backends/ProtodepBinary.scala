@@ -26,7 +26,7 @@ class ProtodepBinary(
     }
   }
 
-  def fetchProtoFiles(root: File, locked: Boolean, https: Boolean): Unit = {
+  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit = {
     val args =
       List(
         Some("--cleanup"),

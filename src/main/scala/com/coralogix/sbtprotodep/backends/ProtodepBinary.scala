@@ -26,12 +26,21 @@ class ProtodepBinary(
     }
   }
 
-  def fetchProtoFiles(root: File, forced: Boolean, cleanup: Boolean, https: Boolean): Unit = {
+  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit = {
     val args =
       List(
-        if (forced) Some("-f") else None,
-        if (cleanup) Some("-c") else None,
-        if (https) Some("-u") else None
+        Some("--cleanup"),
+        if (https) Some("--use-https") else None
+      ).flatten
+    Process(binary.toString :: "up" :: args, root) ! log
+  }
+
+  def updateProtoFiles(root: File, https: Boolean): Unit = {
+    val args =
+      List(
+        Some("-f"),
+        Some("--cleanup"),
+        if (https) Some("--use-https") else None
       ).flatten
     Process(binary.toString :: "up" :: args, root) ! log
   }

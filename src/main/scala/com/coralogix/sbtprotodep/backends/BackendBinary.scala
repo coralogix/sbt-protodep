@@ -15,7 +15,8 @@ import scala.language.postfixOps
 
 trait BackendBinary {
   def isVersion(desiredVersion: String): Boolean
-  def fetchProtoFiles(root: File, forced: Boolean, cleanup: Boolean, https: Boolean): Unit
+  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit
+  def updateProtoFiles(root: File, https: Boolean): Unit
   val binary: File
   private[backends] def version(): Option[String]
 }
@@ -169,10 +170,10 @@ object BackendBinary {
     System.getProperty("os.name").toLowerCase match {
       case mac if mac.contains("mac") =>
         System.getProperty("os.arch").toLowerCase match {
-          case arm if arm.contains("aarch64") => "darwin_arm64"
-          case _                              => "darwin_amd64"
+          case arm if arm.contains("aarch64") => "aarch64-apple-darwin"
+          case _                              => "x86_64-apple-darwin"
         }
-      case win if win.contains("win") => "windows_amd64"
+      case win if win.contains("win") => "x86_64-pc-windows-msvc"
       case linux if linux.contains("linux") =>
         System.getProperty("os.arch").toLowerCase match {
           case "aarch64"          => "aarch64-unknown-linux-musl"

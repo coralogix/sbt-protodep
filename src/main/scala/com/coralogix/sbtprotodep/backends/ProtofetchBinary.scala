@@ -23,17 +23,16 @@ class ProtofetchBinary(
     }
   }
 
-  //TODO: Protofetch does not support some of these flags. As protofetch evolves, if none of these make sense consider changing the base trait
-  def fetchProtoFiles(root: File, forced: Boolean, cleanup: Boolean, https: Boolean): Unit = {
-    println("Ignoring any force, cleanup, https flags as protofetch does not support them")
-    val args: List[String] =
-      List(
-        if (forced) Some("-f") else None,
-        //        if (cleanup) Some("-c") else None,
-        //        if (https) Some("-u") else None
-        None
-      ).flatten
-    println(s"Using binary:  ${binary.toString}")
+  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit = {
+    val args = if (ci) List("--locked") else Nil
+    log.debug(s"Using binary: ${binary.toString}")
     Process(binary.toString :: "fetch" :: args, root) ! log
   }
+
+  def updateProtoFiles(root: File, https: Boolean): Unit = {
+    log.debug(s"Using binary: ${binary.toString}")
+    Process(binary.toString :: "update" :: Nil, root) ! log
+    Process(binary.toString :: "fetch" :: Nil, root) ! log
+  }
+
 }

@@ -50,7 +50,7 @@ object Protodep extends AutoPlugin {
   def generateProject(
     name: String,
     path: Option[String] = None,
-    backend: BackendType = BackendType.Protodep
+    backend: BackendType = BackendType.Protofetch
   ): Project =
     Project(name, file(path.getOrElse(name)))
       .enablePlugins(GrpcDependencies)

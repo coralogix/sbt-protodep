@@ -30,8 +30,8 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.6.0",
       "org.apache.commons"             % "commons-compress" % "1.24.0",
-      "dev.zio"                       %% "zio-test"         % "1.0.18" % Test,
-      "dev.zio"                       %% "zio-test-sbt"     % "1.0.18" % Test
+      "dev.zio"                       %% "zio-test"         % "2.0.19" % Test,
+      "dev.zio"                       %% "zio-test-sbt"     % "2.0.19" % Test
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     scriptedLaunchOpts := {

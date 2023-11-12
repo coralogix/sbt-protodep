@@ -1,19 +1,18 @@
 package com.coralogix.sbtprotodep.backends
 
+import zio._
 import zio.test._
-import zio.test.environment.TestEnvironment
-import zio.{ console, ZIO }
 
 import java.nio.file.Files
 import com.coralogix.sbtprotodep._
 
-object ProtodepBinarySpec extends DefaultRunnableSpec {
-  override def spec: ZSpec[TestEnvironment, Any] =
+object ProtodepBinarySpec extends ZIOSpecDefault {
+  override def spec =
     suite("ProtodepBinary")(
-      testM("can download and unpack protodep")(
+      test("can download and unpack protodep")(
         for {
-          tempDir <- ZIO.effect(Files.createTempDirectory("sbtprotodep"))
-          protodepBinary <- ZIO.effect(
+          tempDir <- ZIO.attempt(Files.createTempDirectory("sbtprotodep"))
+          protodepBinary <- ZIO.attempt(
                               BackendBinary(
                                 _root_.sbt.util.Logger.Null,
                                 "stormcat24",
@@ -24,9 +23,9 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
                               )
                             )
           path = protodepBinary.binary
-          pathExists <- ZIO.effect(path.exists())
-          _          <- console.putStrLn(s"Downloaded protodep to $path")
-          version    <- ZIO.effect(protodepBinary.version())
+          pathExists <- ZIO.attempt(path.exists())
+          _          <- Console.printLine(s"Downloaded protodep to $path")
+          version    <- ZIO.attempt(protodepBinary.version())
         } yield assertTrue(
           pathExists,
           path.toString.endsWith("/protodep"),
@@ -34,10 +33,10 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
           protodepBinary.isVersion(protodepVersion)
         )
       ),
-      testM("can download protofetch")(
+      test("can download protofetch")(
         for {
-          tempDir <- ZIO.effect(Files.createTempDirectory("sbtprotofetch"))
-          protofetchBinary <- ZIO.effect(
+          tempDir <- ZIO.attempt(Files.createTempDirectory("sbtprotofetch"))
+          protofetchBinary <- ZIO.attempt(
                                 BackendBinary(
                                   _root_.sbt.util.Logger.Null,
                                   "coralogix",
@@ -48,10 +47,9 @@ object ProtodepBinarySpec extends DefaultRunnableSpec {
                                 )
                               )
           path = protofetchBinary.binary
-
-          pathExists <- ZIO.effect(path.exists())
-          _          <- console.putStrLn(s"Downloaded protofetch to $path")
-          version    <- ZIO.effect(protofetchBinary.version())
+          pathExists <- ZIO.attempt(path.exists())
+          _          <- Console.printLine(s"Downloaded protofetch to $path")
+          version    <- ZIO.attempt(protofetchBinary.version())
         } yield assertTrue(
           pathExists,
           path.toString.endsWith("/protofetch"),

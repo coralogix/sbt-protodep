@@ -11,7 +11,7 @@ jobs:
       - name: Setup Scala
         uses: olafurpg/setup-scala@v14
         with:
-          java-version: "temurin@17"
+          java-version: "openjdk@1.17"
       - name: Coursier cache
         uses: coursier/cache-action@v5
       - name: Build and test

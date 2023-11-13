@@ -1,6 +1,6 @@
 inThisBuild(
   List(
-    scalaVersion            := "2.12.15",
+    scalaVersion            := "2.12.18",
     dynverSonatypeSnapshots := true,
     organization            := "com.coralogix",
     licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html")),
@@ -38,6 +38,11 @@ lazy val root = (project in file("."))
       scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
-    scriptedBufferLog := false
+    scriptedBufferLog := false,
+    pluginCrossBuild / sbtVersion := {
+      scalaBinaryVersion.value match {
+        case "2.12" => "1.6.2"
+      }
+    }
   )
   .enablePlugins(SbtPlugin)

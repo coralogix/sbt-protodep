@@ -17,6 +17,8 @@ jobs:
       - name: Build and test
         run: |
           sbt -v -J-Xms2048M -J-Xmx2048M -J-Xss6M -J-XX:ReservedCodeCacheSize=256M -J-Dfile.encoding=UTF-8 clean scalafmtCheckAll test scripted
+        env:
+          PROTOFETCH_GIT_PROTOCOL: https
       - name: Cleanup
         run: |
           rm -rf "$HOME/.ivy2/local" || true

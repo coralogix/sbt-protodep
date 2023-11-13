@@ -9,9 +9,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v14
         with:
-          java-version: "adopt@1.11"
+          java-version: "temurin@17"
       - name: Coursier cache
         uses: coursier/cache-action@v5
       - name: Build and test

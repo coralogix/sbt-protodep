@@ -9,14 +9,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v14
         with:
-          java-version: "adopt@1.11"
+          java-version: "openjdk@1.17"
       - name: Coursier cache
         uses: coursier/cache-action@v5
       - name: Build and test
         run: |
           sbt -v -J-Xms2048M -J-Xmx2048M -J-Xss6M -J-XX:ReservedCodeCacheSize=256M -J-Dfile.encoding=UTF-8 clean scalafmtCheckAll test scripted
+        env:
+          PROTOFETCH_GIT_PROTOCOL: https
       - name: Cleanup
         run: |
           rm -rf "$HOME/.ivy2/local" || true

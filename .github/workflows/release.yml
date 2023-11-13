@@ -14,7 +14,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v13
+        uses: olafurpg/setup-scala@v14
         with:
           java-version: "openjdk@1.17"
       - run: .github/scripts/gpg-setup.sh

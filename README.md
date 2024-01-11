@@ -9,7 +9,7 @@ In `plugins.sbt`:
 
 ```scala
 addSbtPlugin("com.thesamet"  % "sbt-protoc" % "1.0.6")
-libraryDependencies += "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.5.1"
+libraryDependencies += "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-codegen" % "0.6.1"
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 addSbtPlugin("com.coralogix"  % "sbt-protodep" % "0.0.14")
 ```

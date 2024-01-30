@@ -36,8 +36,13 @@ object GrpcDependencies extends AutoPlugin {
   override lazy val projectSettings = Seq(
     libraryDependencies ++= Seq(
       // gRPC
-      "com.thesamet.scalapb"               %% "scalapb-runtime-grpc"                    % scalapb.compiler.Version.scalapbVersion,
-      "io.grpc"                             % "grpc-netty"                              % scalapb.compiler.Version.grpcJavaVersion,
+      "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion,
+      "io.grpc"               % "grpc-netty"           % scalapb.compiler.Version.grpcJavaVersion,
+      // zio-grpc-codegen-0.5.3 ->
+      //   com.thesamet.scalapb:compilerplugin:0.11.8, where scalapb.compiler.Version.grpcJavaVersion = 1.43.2
+      //     grpc-netty:1.43.2 ->
+      //       io.netty:netty-codec-http2:4.1.63.Final that has a high level vulnerability
+      "io.netty"                            % "netty-codec-http2"                       % "4.1.106.Final",
       "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % "2.5.0-2" % "protobuf",
       "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % "2.5.0-2",
       "io.github.scalapb-json"             %% "scalapb-circe"                           % "0.11.2"

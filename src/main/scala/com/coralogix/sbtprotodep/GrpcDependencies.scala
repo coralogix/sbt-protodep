@@ -45,7 +45,11 @@ object GrpcDependencies extends AutoPlugin {
       "io.netty"                            % "netty-codec-http2"                       % "4.1.106.Final",
       "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % "2.5.0-2" % "protobuf",
       "com.thesamet.scalapb.common-protos" %% "proto-google-common-protos-scalapb_0.11" % "2.5.0-2",
-      "io.github.scalapb-json"             %% "scalapb-circe"                           % "0.11.2"
+      // proto-google-common-protos-scalapb_0.11-2.5.0-2 ->
+      //   scalapb-runtime-grpc-0.11.8 ->
+      //     grpc-protobuf:1.43.2 that has a high level vulnerability
+      "io.grpc"                 % "grpc-protobuf" % "1.61.0",
+      "io.github.scalapb-json" %% "scalapb-circe" % "0.11.2"
     ),
     scalapbGeneratorOptions := Seq(GeneratorOption.Grpc),
     Compile / PB.targets := Seq(

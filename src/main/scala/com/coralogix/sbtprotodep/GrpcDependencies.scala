@@ -65,8 +65,14 @@ object GrpcDependencies extends AutoPlugin {
     val ci = insideCI.value
     val https = protodepUseHttps.value
 
-    def run(): Unit =
-      protodepBinary.fetchProtoFiles(root, ci = ci, https = https)
+    def run(): Unit = {
+      val exitCode =
+        protodepBinary.fetchProtoFiles((logLevel ?? Level.Info).value)(root, ci = ci, https = https)
+      if (exitCode != 0)
+        throw new IllegalStateException(
+          s"${protodepBinary.binary} returned non-zero exit code, aborting"
+        );
+    }
 
     val cachedProtodepUp = Tracked.inputChanged[HashModifiedFileInfo, Unit](
       s.cacheStoreFactory.make("protodep.toml")
@@ -87,6 +93,11 @@ object GrpcDependencies extends AutoPlugin {
     val protodepBinary = Protodep.autoImport.protodepBackendBinary.value
     val root = protodepRoot.value
     val https = protodepUseHttps.value
-    protodepBinary.updateProtoFiles(root, https = https)
+    val exitCode =
+      protodepBinary.updateProtoFiles((logLevel ?? Level.Info).value)(root, https = https)
+    if (exitCode != 0)
+      throw new IllegalStateException(
+        s"${protodepBinary.binary} returned non-zero exit code, aborting"
+      );
   }
 }

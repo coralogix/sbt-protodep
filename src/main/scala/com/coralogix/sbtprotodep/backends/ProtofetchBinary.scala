@@ -1,16 +1,24 @@
 package com.coralogix.sbtprotodep.backends
 
-import sbt.util.Logger
+import sbt.util.{ Level, Logger }
 
 import java.io.File
 import scala.language.postfixOps
+import scala.sys.env
 import scala.sys.process.Process
 import scala.util.{ Success, Try }
+
+object ProtofetchBinary {
+  private val envLogVar = "RUST_LOG"
+}
 
 class ProtofetchBinary(
   log: Logger,
   val binary: File
 ) extends BackendBinary {
+
+  import ProtofetchBinary._
+
   val backend: BackendType = BackendType.Protofetch
   def isVersion(desiredVersion: String): Boolean =
     version().exists(_.endsWith(desiredVersion.stripPrefix("v")))
@@ -23,16 +31,34 @@ class ProtofetchBinary(
     }
   }
 
-  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit = {
-    val args = if (ci) List("--locked") else Nil
-    log.debug(s"Using binary: ${binary.toString}")
-    Process(binary.toString :: "fetch" :: args, root) ! log
+  /** Maps `Level.Value` to the equivalent level in `env_logger`. */
+  private def envLogLevel(level: Level.Value): String = {
+    import Level._
+
+    def value(level: Level.Value): String =
+      level match {
+        case Info  => "info"
+        case Debug => "debug"
+        case Warn  => "warn"
+        case Error => "error"
+      }
+    env.getOrElse(envLogVar, value(level))
   }
 
-  def updateProtoFiles(root: File, https: Boolean): Unit = {
-    log.debug(s"Using binary: ${binary.toString}")
-    Process(binary.toString :: "update" :: Nil, root) ! log
-    Process(binary.toString :: "fetch" :: Nil, root) ! log
+  private def proc(level: Level.Value)(args: List[String], root: File) = {
+    val bin = binary.toString
+    log.debug(s"Using binary: $bin")
+    Process(bin :: args, root, envLogVar -> envLogLevel(level))
+  }
+
+  def fetchProtoFiles(level: Level.Value)(root: File, ci: Boolean, https: Boolean): Int = {
+    val args = if (ci) List("--locked") else Nil
+    proc(level)("fetch" :: args, root) ! log
+  }
+
+  def updateProtoFiles(level: Level.Value)(root: File, https: Boolean): Int = {
+    val p = proc(level)("update" :: Nil, root) #&& proc(level)("fetch" :: Nil, root)
+    p ! log
   }
 
 }

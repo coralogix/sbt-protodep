@@ -3,7 +3,7 @@ package com.coralogix.sbtprotodep.backends
 import org.apache.commons.compress.archivers.tar.{ TarArchiveEntry, TarArchiveInputStream }
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.utils.IOUtils
-import sbt.util.Logger
+import sbt.util.{ Level, Logger }
 
 import java.io.{ BufferedOutputStream, File, FileOutputStream }
 import java.net.URL
@@ -15,8 +15,8 @@ import scala.language.postfixOps
 
 trait BackendBinary {
   def isVersion(desiredVersion: String): Boolean
-  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit
-  def updateProtoFiles(root: File, https: Boolean): Unit
+  def fetchProtoFiles(level: Level.Value)(root: File, ci: Boolean, https: Boolean): Int
+  def updateProtoFiles(level: Level.Value)(root: File, https: Boolean): Int
   val binary: File
   private[backends] def version(): Option[String]
 }

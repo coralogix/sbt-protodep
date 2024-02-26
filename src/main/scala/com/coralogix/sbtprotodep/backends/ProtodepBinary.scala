@@ -1,6 +1,6 @@
 package com.coralogix.sbtprotodep.backends
 
-import sbt.util.Logger
+import sbt.util.{ Level, Logger }
 
 import java.io.File
 import scala.language.postfixOps
@@ -26,7 +26,7 @@ class ProtodepBinary(
     }
   }
 
-  def fetchProtoFiles(root: File, ci: Boolean, https: Boolean): Unit = {
+  def fetchProtoFiles(level: Level.Value)(root: File, ci: Boolean, https: Boolean): Int = {
     val args =
       List(
         Some("--cleanup"),
@@ -35,7 +35,7 @@ class ProtodepBinary(
     Process(binary.toString :: "up" :: args, root) ! log
   }
 
-  def updateProtoFiles(root: File, https: Boolean): Unit = {
+  def updateProtoFiles(level: Level.Value)(root: File, https: Boolean): Int = {
     val args =
       List(
         Some("-f"),

@@ -16,6 +16,7 @@ class ProtofetchBinary(
   log: Logger,
   val binary: File
 ) extends BackendBinary {
+  // foo
 
   import ProtofetchBinary._
 

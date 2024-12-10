@@ -14,11 +14,15 @@ jobs:
           java-version: "openjdk@1.17"
       - name: Coursier cache
         uses: coursier/cache-action@v5
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Build and test
         run: |
           sbt -v -J-Xms2048M -J-Xmx2048M -J-Xss6M -J-XX:ReservedCodeCacheSize=256M -J-Dfile.encoding=UTF-8 clean scalafmtCheckAll test scripted
         env:
-          PROTOFETCH_GIT_PROTOCOL: https
+          PROTOFETCH_GIT_PROTOCOL: ssh
       - name: Cleanup
         run: |
           rm -rf "$HOME/.ivy2/local" || true

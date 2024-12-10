@@ -1,6 +1,6 @@
 logLevel := Level.Debug
 
-Global / protodepUseHttps := true
+Global / protodepUseHttps := false
 enablePlugins(Protodep)
 
 ThisBuild / scalaVersion := "2.13.12"

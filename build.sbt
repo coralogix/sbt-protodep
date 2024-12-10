@@ -17,6 +17,12 @@ inThisBuild(
         "Zdenek Hrebicek",
         "zdenek.hrebicek@gmail.com",
         url("https://www.coralogix.com")
+      ),
+      Developer(
+        "markusa380",
+        "Markus Appel",
+        "markusappel@hotmail.de",
+        url("https://www.coralogix.com")
       )
     )
   )
